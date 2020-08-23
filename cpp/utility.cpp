@@ -1,6 +1,7 @@
 #include "utility.hpp"
 #include <stdlib.h>
 #include <sstream>
+#include <iterator>
 
 void LogError::log(const std::string errMsg) {
     std::cerr << "-> An error occured : " << errMsg << std::endl;
