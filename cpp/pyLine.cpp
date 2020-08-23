@@ -1,7 +1,9 @@
 #include "pyLine.hpp"
+#include "utility.hpp"
 #include <cctype>
 #include <iterator>
 #include <set>
+#include <regex>
 
 PyLine::PyLine(std::string lineOfCode) {
     line = lineOfCode;
@@ -23,13 +25,23 @@ std::string PyLine::get() {
     return line;
 }
 
+std::vector<std::string> PyLine::extractBlockIds() {
+    std::regex reg(".*#BlockIds=(.*)");
+    std::smatch match;
+
+    if (std::regex_match(line, reg) && std::regex_search(line, match, reg)) {
+        std::vector<std::string> elems = {};
+        split(match[1], '\'', elems);
+        return elems;
+    }
+    return {};
+}
+
 bool PyLine::isStruct() {
-    std::set<std::string> pyStructs = {"if", "for", "else", "elif", "while", "def", "class"};
-    return pyStructs.find(getFirstWord()) != pyStructs.end();
+    return isIn<std::string>(getFirstWord(), {"if", "for", "else", "elif", "while", "def", "class"});
 }
 bool PyLine::isConditianal() {
-    std::set<std::string> pyStructs = {"if", "else", "elif", "while"};
-    return pyStructs.find(getFirstWord()) != pyStructs.end();
+    return isIn<std::string>(getFirstWord(), {"if", "else", "elif", "while"});
 }
 bool PyLine::endByTwoPoints() {
     return (*prev(lastChar)) == ':';
